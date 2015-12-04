@@ -1,0 +1,23 @@
+{
+    "name": "speedwork/filesystem",
+    "type": "library",
+    "description": "The Speedwork Filesystem package.",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Sankar Suda",
+            "email": "sankar.suda@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.4",
+        "symfony/filesystem": "v3.0.0",
+        "symfony/finder": "v3.0.0",
+        "speedwork/util": "dev-master"
+    },
+    "autoload" : {
+        "psr-4": { "Speedwork\\Filesystem\\": "src" }
+    },
+    "minimum-stability": "dev",
+    "preferred-install": "dist"
+}
