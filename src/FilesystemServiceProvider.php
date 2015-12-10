@@ -22,6 +22,10 @@ class FilesytemServiceProvider extends ServiceProvider
             return new Filesystem();
         };
 
+        $app['files'] = function ($app) {
+            return $app['fs'];
+        };
+
         $app['finder'] = function ($app) {
             return new Finder();
         };
@@ -31,11 +35,19 @@ class FilesytemServiceProvider extends ServiceProvider
         };
 
         $app['filesystem.disk'] = function ($app) {
-            return $app['filesystem']->disk($app['filesystems.default']);
+            $config = ($app['filesystems.default'])
+            ? $app['filesystems.default']
+            : $app['config']->get('filesystems.default');
+
+            return $app['filesystem']->disk($config);
         };
 
         $app['filesystem.cloud'] = function ($app) {
-            return $app['filesystem']->disk($app['filesystems.cloud']);
+            $config = ($app['filesystems.cloud'])
+            ? $app['filesystems.cloud']
+            : $app['config']->get('filesystems.cloud');
+
+            return $app['filesystem']->disk($config);
         };
     }
 }
