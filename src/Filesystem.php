@@ -12,14 +12,13 @@
 namespace Speedwork\Filesystem;
 
 use Symfony\Component\Filesystem\Filesystem as BaseFilesystem;
-use Symfony\Component\Finder\Finder;
 
 /**
- * Symfony Filesystem & Finder component Provider.
+ * Symfony Filesystem component Provider.
  *
  * @author sankar <sankar.suda@gmail.com>
  */
-class Filesytem extends BaseFilesystem implements FilesystemInterface
+class Filesystem extends BaseFilesystem
 {
     /**
      * Get the contents of a file.

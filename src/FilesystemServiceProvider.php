@@ -11,7 +11,7 @@ use Symfony\Component\Finder\Finder;
  *
  * @author sankar <sankar.suda@gmail.com>
  */
-class FilesytemServiceProvider extends ServiceProvider
+class FilesystemServiceProvider extends ServiceProvider
 {
     /**
      * {@inheritdoc}
