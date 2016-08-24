@@ -32,9 +32,9 @@ interface FilesystemInterface
      *
      * @param string $path
      *
-     * @return string
-     *
      * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
+     *
+     * @return string
      */
     public function get($path);
 
