@@ -44,9 +44,9 @@ class FilesystemAdapter implements FilesystemInterface
      *
      * @param string $path
      *
-     * @return string
-     *
      * @throws FileNotFoundException
+     *
+     * @return string
      */
     public function get($path)
     {
@@ -328,9 +328,9 @@ class FilesystemAdapter implements FilesystemInterface
      *
      * @param string|null $visibility
      *
-     * @return string
-     *
      * @throws \InvalidArgumentException
+     *
+     * @return string
      */
     protected function parseVisibility($visibility)
     {
@@ -355,9 +355,9 @@ class FilesystemAdapter implements FilesystemInterface
      * @param string $method
      * @param array  $parameters
      *
-     * @return mixed
-     *
      * @throws \BadMethodCallException
+     *
+     * @return mixed
      */
     public function __call($method, array $parameters)
     {

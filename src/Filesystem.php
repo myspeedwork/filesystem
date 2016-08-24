@@ -6,9 +6,8 @@
  * @link http://github.com/speedwork
  *
  * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
+ * file that was distributed with this source code
  */
-
 namespace Speedwork\Filesystem;
 
 use Symfony\Component\Filesystem\Filesystem as BaseFilesystem;
@@ -25,9 +24,9 @@ class Filesystem extends BaseFilesystem
      *
      * @param string $path
      *
-     * @return string
-     *
      * @throws FileNotFoundException
+     *
+     * @return string
      */
     public function get($path)
     {
@@ -43,9 +42,9 @@ class Filesystem extends BaseFilesystem
      *
      * @param string $path
      *
-     * @return mixed
-     *
      * @throws FileNotFoundException
+     *
+     * @return mixed
      */
     public function getRequire($path)
     {
