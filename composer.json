@@ -16,13 +16,17 @@
         "symfony/finder": "~2.7|^3.0",
         "speedwork/util": "dev-master"
     },
+    "require-dev" : {
+        "phpunit/phpunit": "~3.7",
+        "satooshi/php-coveralls": "dev-master"
+    },
     "suggest": {
         "league/flysystem": "Required to use the Flysystem local and FTP drivers (~1.0).",
         "league/flysystem-aws-s3-v3": "Required to use the Flysystem S3 driver (~1.0).",
         "league/flysystem-rackspace": "Required to use the Flysystem Rackspace driver (~1.0)."
     },
     "autoload" : {
-        "psr-4": { 
+        "psr-4": {
             "Speedwork\\Filesystem\\": "src"
         }
     },
