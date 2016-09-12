@@ -11,31 +11,74 @@
 
 namespace Speedwork\Filesystem;
 
-use Symfony\Component\Filesystem\Filesystem as BaseFilesystem;
+use ErrorException;
+use FilesystemIterator;
+use Speedwork\Core\Traits\Macroable;
+use Symfony\Component\Finder\Finder;
 
-/**
- * Symfony Filesystem component Provider.
- *
- * @author sankar <sankar.suda@gmail.com>
- */
-class Filesystem extends BaseFilesystem
+class Filesystem
 {
+    use Macroable;
+
+    /**
+     * Determine if a file or directory exists.
+     *
+     * @param string $path
+     *
+     * @return bool
+     */
+    public function exists($path)
+    {
+        return file_exists($path);
+    }
+
     /**
      * Get the contents of a file.
      *
      * @param string $path
+     * @param bool   $lock
      *
-     * @throws FileNotFoundException
+     * @throws \Speedwork\Filesystem\FileNotFoundException
      *
      * @return string
      */
-    public function get($path)
+    public function get($path, $lock = false)
     {
         if ($this->isFile($path)) {
-            return file_get_contents($path);
+            return $lock ? $this->sharedGet($path) : file_get_contents($path);
         }
 
         throw new FileNotFoundException("File does not exist at path {$path}");
+    }
+
+    /**
+     * Get contents of a file with shared access.
+     *
+     * @param string $path
+     *
+     * @return string
+     */
+    public function sharedGet($path)
+    {
+        $contents = '';
+
+        $handle = fopen($path, 'rb');
+
+        if ($handle) {
+            try {
+                if (flock($handle, LOCK_SH)) {
+                    clearstatcache(true, $path);
+
+                    $contents = fread($handle, $this->size($path) ?: 1);
+
+                    flock($handle, LOCK_UN);
+                }
+            } finally {
+                fclose($handle);
+            }
+        }
+
+        return $contents;
     }
 
     /**
@@ -43,14 +86,14 @@ class Filesystem extends BaseFilesystem
      *
      * @param string $path
      *
-     * @throws FileNotFoundException
+     * @throws \Speedwork\Filesystem\FileNotFoundException
      *
      * @return mixed
      */
     public function getRequire($path)
     {
         if ($this->isFile($path)) {
-            return require $path;
+            return include $path;
         }
 
         throw new FileNotFoundException("File does not exist at path {$path}");
@@ -65,7 +108,7 @@ class Filesystem extends BaseFilesystem
      */
     public function requireOnce($file)
     {
-        require_once $file;
+        include_once $file;
     }
 
     /**
@@ -113,6 +156,32 @@ class Filesystem extends BaseFilesystem
     }
 
     /**
+     * Delete the file at a given path.
+     *
+     * @param string|array $paths
+     *
+     * @return bool
+     */
+    public function delete($paths)
+    {
+        $paths = is_array($paths) ? $paths : func_get_args();
+
+        $success = true;
+
+        foreach ($paths as $path) {
+            try {
+                if (!@unlink($path)) {
+                    $success = false;
+                }
+            } catch (ErrorException $e) {
+                $success = false;
+            }
+        }
+
+        return $success;
+    }
+
+    /**
      * Move a file to a new location.
      *
      * @param string $path
@@ -139,6 +208,23 @@ class Filesystem extends BaseFilesystem
     }
 
     /**
+     * Create a hard link to the target file or directory.
+     *
+     * @param string $target
+     * @param string $link
+     */
+    public function link($target, $link)
+    {
+        if (!windows_os()) {
+            return symlink($target, $link);
+        }
+
+        $mode = $this->isDirectory($target) ? 'J' : 'H';
+
+        exec("mklink /{$mode} \"{$link}\" \"{$target}\"");
+    }
+
+    /**
      * Extract the file name from a file path.
      *
      * @param string $path
@@ -148,6 +234,30 @@ class Filesystem extends BaseFilesystem
     public function name($path)
     {
         return pathinfo($path, PATHINFO_FILENAME);
+    }
+
+    /**
+     * Extract the trailing name component from a file path.
+     *
+     * @param string $path
+     *
+     * @return string
+     */
+    public function basename($path)
+    {
+        return pathinfo($path, PATHINFO_BASENAME);
+    }
+
+    /**
+     * Extract the parent directory from a file path.
+     *
+     * @param string $path
+     *
+     * @return string
+     */
+    public function dirname($path)
+    {
+        return pathinfo($path, PATHINFO_DIRNAME);
     }
 
     /**
@@ -260,6 +370,62 @@ class Filesystem extends BaseFilesystem
     }
 
     /**
+     * Get an array of all files in a directory.
+     *
+     * @param string $directory
+     *
+     * @return array
+     */
+    public function files($directory)
+    {
+        $glob = glob($directory.'/*');
+
+        if ($glob === false) {
+            return [];
+        }
+
+        // To get the appropriate files, we'll simply glob the directory and filter
+        // out any "files" that are not truly files so we do not end up with any
+        // directories in our list, but only true files within the directory.
+        return array_filter(
+            $glob, function ($file) {
+                return filetype($file) == 'file';
+            }
+        );
+    }
+
+    /**
+     * Get all of the files from the given directory (recursive).
+     *
+     * @param string $directory
+     * @param bool   $hidden
+     *
+     * @return array
+     */
+    public function allFiles($directory, $hidden = false)
+    {
+        return iterator_to_array(Finder::create()->files()->ignoreDotFiles(!$hidden)->in($directory), false);
+    }
+
+    /**
+     * Get all of the directories within a given directory.
+     *
+     * @param string $directory
+     *
+     * @return array
+     */
+    public function directories($directory)
+    {
+        $directories = [];
+
+        foreach (Finder::create()->in($directory)->directories()->depth(0) as $dir) {
+            $directories[] = $dir->getPathname();
+        }
+
+        return $directories;
+    }
+
+    /**
      * Create a directory.
      *
      * @param string $path
@@ -276,6 +442,26 @@ class Filesystem extends BaseFilesystem
         }
 
         return mkdir($path, $mode, $recursive);
+    }
+
+    /**
+     * Move a directory.
+     *
+     * @param string $from
+     * @param string $to
+     * @param bool   $overwrite
+     *
+     * @return bool
+     */
+    public function moveDirectory($from, $to, $overwrite = false)
+    {
+        if ($overwrite && $this->isDirectory($to)) {
+            if (!$this->deleteDirectory($to)) {
+                return false;
+            }
+        }
+
+        return @rename($from, $to) === true;
     }
 
     /**
@@ -317,6 +503,7 @@ class Filesystem extends BaseFilesystem
                     return false;
                 }
             }
+
             // If the current items is just a regular file, we will just copy this to the new
             // location and keep looping. If for some reason the copy fails we'll bail out
             // and return false, so the developer is aware that the copy process failed.
@@ -355,6 +542,7 @@ class Filesystem extends BaseFilesystem
             if ($item->isDir() && !$item->isLink()) {
                 $this->deleteDirectory($item->getPathname());
             }
+
             // If the item is just a file, we can go ahead and delete it since we're
             // just looping through and waxing all of the files in this directory
             // and calling directories recursively, so we delete the real path.
