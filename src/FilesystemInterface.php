@@ -41,7 +41,7 @@ interface FilesystemInterface
      *
      * @param string $path
      *
-     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
+     * @throws \Speedwork\Filesystem\FileNotFoundException
      *
      * @return string
      */

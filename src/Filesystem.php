@@ -82,36 +82,6 @@ class Filesystem
     }
 
     /**
-     * Get the returned value of a file.
-     *
-     * @param string $path
-     *
-     * @throws \Speedwork\Filesystem\FileNotFoundException
-     *
-     * @return mixed
-     */
-    public function getRequire($path)
-    {
-        if ($this->isFile($path)) {
-            return include $path;
-        }
-
-        throw new FileNotFoundException("File does not exist at path {$path}");
-    }
-
-    /**
-     * Require the given file once.
-     *
-     * @param string $file
-     *
-     * @return mixed
-     */
-    public function requireOnce($file)
-    {
-        include_once $file;
-    }
-
-    /**
      * Write the contents of a file.
      *
      * @param string $path

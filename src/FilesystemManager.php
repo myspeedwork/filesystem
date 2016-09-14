@@ -27,7 +27,7 @@ class FilesystemManager
     /**
      * The application instance.
      *
-     * @var \Illuminate\Contracts\Foundation\Application
+     * @var \Speedwork\Foundation\Application
      */
     protected $app;
 
@@ -48,7 +48,7 @@ class FilesystemManager
     /**
      * Create a new filesystem manager instance.
      *
-     * @param \Illuminate\Contracts\Foundation\Application $app
+     * @param \Speedwork\Core\Application $app
      */
     public function __construct($app)
     {
@@ -162,7 +162,7 @@ class FilesystemManager
      *
      * @param array $config
      *
-     * @return \Illuminate\Contracts\Filesystem\Cloud
+     * @return \Speedwork\Filesystem\Cloud
      */
     public function createS3Driver(array $config)
     {
@@ -198,7 +198,7 @@ class FilesystemManager
      *
      * @param array $config
      *
-     * @return \Illuminate\Contracts\Filesystem\Cloud
+     * @return \Speedwork\Filesystem\Cloud
      */
     public function createRackspaceDriver(array $config)
     {
