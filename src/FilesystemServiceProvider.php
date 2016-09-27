@@ -35,9 +35,9 @@ class FilesystemServiceProvider extends ServiceProvider
             return $app['fs'];
         };
 
-        $app['finder'] = function ($app) {
-            return new Finder();
-        };
+        $app['finder'] = $app->factory(function () {
+            return Finder::create();
+        });
 
         $app['filesystem'] = function ($app) {
             return new FilesystemManager($app);
