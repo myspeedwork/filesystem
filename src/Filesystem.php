@@ -185,7 +185,7 @@ class Filesystem
      */
     public function link($target, $link)
     {
-        if (!windows_os()) {
+        if (strtoupper(substr(PHP_OS, 0, 3)) !== 'WIN') {
             return symlink($target, $link);
         }
 
@@ -473,7 +473,6 @@ class Filesystem
                     return false;
                 }
             }
-
             // If the current items is just a regular file, we will just copy this to the new
             // location and keep looping. If for some reason the copy fails we'll bail out
             // and return false, so the developer is aware that the copy process failed.
